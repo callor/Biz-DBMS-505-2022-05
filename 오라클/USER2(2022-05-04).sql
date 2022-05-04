@@ -86,6 +86,37 @@ GROUP BY sc_subject
 HAVING ROUND( AVG( sc_score ), 2) > 75;
 
 -- 음악, 국어 과목의 총점과 평균 계산
+SELECT sc_subject,SUM(sc_score) 총점, ROUND(AVG( sc_score) ,2) 평균
+FROM tbl_score
+GROUP BY sc_subject
+HAVING sc_subject = '음악' OR sc_subject = '국어';
+
+SELECT sc_subject,SUM(sc_score) 총점, ROUND(AVG( sc_score) ,2) 평균
+FROM tbl_score
+GROUP BY sc_subject
+HAVING sc_subject IN('음악', '국어');
+
+SELECT sc_subject,SUM(sc_score) 총점, ROUND(AVG( sc_score) ,2) 평균
+FROM tbl_score
+WHERE sc_subject IN('음악','국어')
+GROUP BY sc_subject;
+
+/*
+통계함수와 GROUP BY 를 사용하여 통계연산을 수행할때 주의사항
+통계연산 결과에 어떤 조건을 부여하여 데이터를 보고자 할때는
+WHERE 절이나 HAVING 절에 조건을 부여 할 수 있다.
+
+통계연산이 수행된 결과 대하여 조건을 부여할때는 
+어쩔수 없이 HAVING 절에 조건을 부여해야할 것이다
+
+하지만 연산결과 아닌 어떤 조건에 일치하는 데이터들에게만
+통계연산을 수행하고자 할때는
+WHERE 절에 조건을 부여할수 없는지 반드시 고민해야 한다.
+
+통계함수와 GROUP BY 를 통한 통계산은
+SQL 조회명령에서 많이 느린 연산이다
+*/
+
 
 
 
