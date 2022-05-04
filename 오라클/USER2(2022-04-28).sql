@@ -172,6 +172,22 @@ SELECT st_dept, COUNT(st_dept)
 FROM tbl_student
 GROUP BY st_dept;
 
+-- 위 결과에서 학생수가 많은 학과 부터 보여주기
+SELECT st_dept, COUNT(st_dept)
+FROM tbl_student
+GROUP BY st_dept
+ORDER BY COUNT(st_dept) DESC;
+
+SELECT st_dept, COUNT(st_dept) AS 학생수
+FROM tbl_student
+GROUP BY st_dept
+ORDER BY 학생수 DESC;
+
+SELECT st_dept, COUNT(st_dept) AS 학생수
+FROM tbl_student
+GROUP BY st_dept
+ORDER BY 학생수 DESC, st_dept;
+
 
 
 
