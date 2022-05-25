@@ -85,6 +85,137 @@ VALUES( seq_belong.NEXTVAL, '20220003','D0007');
 
 SELECT * FROM tbl_belong;
 
+-- tbl_student, tbl_dept, tbl_belong 3개의 table LEFT JOIN 하여
+-- 학번, 이름, 학과코드, 학과명, 학년 을 표시하는 SELECT 문 작성
+
+-- Projection(칼럼을 제한하여 보여주기)
+SELECT st_num, st_name, st_grade
+FROM tbl_student;
+
+-- 학생정보를 확인하면서 어떤학과에 소속되었는지를 알고싶다
+-- 소속은 tbl_belong 에 저장되어 있다
+
+SELECT st_num, st_name, st_grade
+FROM tbl_student;
+
+-- 20220001 학생이 어떤 학과 소속인지 알고싶다
+SELECT *
+FROM tbl_belong
+WHERE b_stnum = '20220001';
+
+-- 20220001 학생이 소속된 학과가 D0001 인것을 확인햇다
+-- D0001 학과이름이 무엇인지 궁금하다
+SELECT * 
+FROM tbl_dept
+WHERE d_code = 'D0001';
+
+SELECT ST.st_num, ST.st_name, B.b_dcode, D.d_name, ST.st_grade
+FROM tbl_student ST
+    LEFT JOIN tbl_belong B
+        ON ST.st_num = B.b_stnum
+    LEFT JOIN tbl_dept D
+        ON B.b_dcode = D.d_code
+ORDER BY st_num , b_dcode ;        
+
+SELECT ST.st_num, ST.st_name, B.b_dcode, D.d_name, ST.st_grade
+FROM tbl_student ST, tbl_belong B, tbl_dept D
+WHERE ST.st_num = B.b_stnum AND B.b_dcode = D.d_code;
+
+-- 학생, 학과, 소속 테이블간에 FK 설정하기
+-- 1. FK 설정하기 앞서 참조무결성 관계를 조회하기
+-- 다음의 SQL 의 결과에서 결과가 한개도 없어야 참조무결성 관계가 성립된다
+SELECT ST.st_num, ST.st_name,B.b_seq, B.b_dcode, D.d_name, ST.st_grade
+FROM tbl_student ST
+    LEFT JOIN tbl_belong B
+        ON ST.st_num = B.b_stnum
+    LEFT JOIN tbl_dept D
+        ON B.b_dcode = D.d_code
+WHERE ST_NUM IS NULL OR D_NAME IS NULL;
+
+-- 위의 SQL 결과 참조무결성이 성립되지 않는 데이터들은
+-- 10, 9, 11, 7 의 Seq 값을 갖고있다
+-- 2. 참조무결성이 성립되지 않은 데이터를 삭제한다.
+DELETE FROM tbl_belong 
+WHERE b_seq IN( 10, 9, 11, 7 );
+
+SELECT b_seq, b_stnum, b_dcode,st_num, d_name
+FROM tbl_belong
+    LEFT JOIN tbl_student
+        ON b_stnum = st_num
+    LEFT JOIN tbl_dept
+        ON b_dcode = d_code
+WHERE st_num IS NULL OR d_name IS NULL;        
+
+
+-- 3. 테이블간의 참조무결성 제약조건을 부여한다
+-- 참조무결성 제약조건을 테이블에 추가하는데
+-- 이때는 Relation 테이블에 추가한다
+
+-- 테이블에 FK 를 추가하여 참조무결성 제약조건을 부여한다
+ALTER TABLE tbl_belong
+ADD CONSTRAINT FK_tbl_student
+FOREIGN KEY (b_stnum)
+REFERENCES tbl_student ( st_num );
+
+ALTER TABLE tbl_belong
+ADD CONSTRAINT FK_tbl_dept
+FOREIGN KEY (b_dcode)
+REFERENCES tbl_dept(d_code);
+
+SELECT * FROM tbl_student;
+/*
+20220001	홍길동	1		
+20220002	이몽룡	3		
+20220003	성춘향	2		
+*/
+SELECT * FROM tbl_dept;
+/*
+D0001	컴퓨터공학	장영실	505
+D0002	체육과	임꺽정	501
+D0003	법학과	장영자	502
+*/
+SELECT * FROM tbl_belong;
+/*1	20220001	D0001
+2	20220002	D0001
+3	20220002	D0002
+4	20220003	D0001
+5	20220003	D0002
+6	20220003	D0003
+*/
+
+-- tbl_student 에 아직 추가되지 않은 학번을 belong table 에 추가하기
+-- tbl_student 에 없는 20220004 학번을 추가하려고 했더니
+-- parent key not found 오류가 발생한다
+INSERT INTO tbl_belong(b_seq, b_stnum, b_dcode) 
+VALUES(seq_belong.NEXTVAL, '20220004', 'D0003' ); 
+
+-- 먼저 tbl_student 에 해당 학번의 학생정보를 추가해 두어야 한다
+-- tbl_student 에 아래 데이터를 추가한 후 다시 위의 SQL 을 실행하면 정상 추가
+INSERT INTO tbl_student( st_num, st_name, st_grade ) 
+VALUES('20220004','장보고', 2);
+
+-- tbl_belong 에 등록된 학번의 정보를  tbl_student 에서 삭제하려고 한다.
+-- 이미 tbl_belong 에 등록된 학번이므로 학번의 정보를 삭제할수 없다
+-- child key found
+-- FK 를 설정할때
+-- parent table 의 데이터를 삭제하려고 할때 child table 에 데이터 있으면
+-- 보통 삭제 금지, 
+-- parent table 데이터를 변경(Update) 하려고 할때 child table 에 데이터 있으면
+-- 보통 변경 금지
+
+-- FK의 옵션을 지정하여 parent 의 정보가 삭제되면, child 데이터를 모두 삭제하거나
+-- parent 의 데이터가 변경되면 child 데이터를 변경하도록 설정할수 있다
+DELETE FROM tbl_student WHERE st_num = '20220004' ;
+
+-- 만약 parent table 의 데이터를 일괄 변경하거나, table 의 구조를 변경하려고 하면
+-- FK 를 먼저 제거하고 실행을 해야 한다.
+ALTER TABLE tbl_belong
+DROP CONSTRAINT FK_tbl_student CASCADE;
+
+
+
+
+
 
 
 
