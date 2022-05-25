@@ -15,6 +15,7 @@ VALUES( '20220001', '홍길동');
 -- 학과 테이블
 -- 학과 코드는 PK 로 선언하고
 -- 학과이름은 NULL 이거나 중복되지 않도록 설정
+DROP TABLE tbl_dept;
 CREATE TABLE tbl_dept (
 
     d_code VARCHAR2(5) PRIMARY KEY,
@@ -40,6 +41,7 @@ CREATE TABLE tbl_dept (
 
 -- 이럴때는 실제 데이터와 관련없는 단일 칼럼을 추가하고
 -- PK 설정하는 설계를 할 필요가 있다
+DROP TABLE tbl_belong;
 CREATE TABLE tbl_belong (
     
     b_seq NUMBER PRIMARY KEY,
@@ -61,7 +63,7 @@ VALUES('D0002','전자공학','이몽룡','506');
 
 -- 학번 1번학생의 소속학과(D0001)을 등록
 INSERT INTO tbl_belong(b_seq, b_stnum, b_dcode)
-VALUES(1,'202200001','D0001');
+VALUES(1,'20220001','D0001');
 
 -- 학생들의 소속학과(코드)를 확인하는 JOIN 문
 SELECT ST.st_num, ST.st_name, B.b_dcode, ST.st_grade
@@ -69,6 +71,19 @@ FROM tbl_student ST
     LEFT JOIN tbl_belong B
         ON ST.st_num = B.b_stnum;
 
+
+INSERT INTO tbl_student(st_num, st_name)        VALUES ('20220001','홍길동');
+INSERT INTO tbl_belong(b_seq,b_stnum, b_dcode ) VALUES(1,'20220001','D0001');
+INSERT INTO tbl_dept(d_code, d_name )     VALUES('D0001','컴퓨터공학');
+
+SELECT ST.st_num, ST.st_name, 
+        B.b_dcode,D.d_name, D.d_pro,
+        ST.st_grade, D.d_class
+FROM tbl_student ST
+    LEFT JOIN tbl_belong B
+        ON ST.st_num = B.b_stnum
+    LEFT JOIN tbl_dept D
+        ON B.b_dcode = D.d_code;
 
 
 
