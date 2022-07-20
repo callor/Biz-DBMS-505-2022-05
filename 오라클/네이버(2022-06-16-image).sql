@@ -10,4 +10,7 @@ INCREMENT BY 1 START WITH 1;
 SELECT * FROM tbl_bbs, tbl_images
 WHERE b_seq = i_bseq;
 
+SELECT * FROM  tbl_images;
+
+
 
