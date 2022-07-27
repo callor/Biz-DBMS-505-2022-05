@@ -184,8 +184,14 @@ GROUP BY sc_stnum, st_name;
  Column 방향으로 펼처서 보는것이 편리하다
 */
 
+SELECT sc_stnum,
+group_concat(sc_score)
+FROM tbl_score
+GROUP BY sc_stnum;
 
-
+DESC tbl_student;
+DESC tbl_score;
+DESC tbl_subject;
 
 
 
