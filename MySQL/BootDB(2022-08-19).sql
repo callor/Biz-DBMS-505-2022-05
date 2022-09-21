@@ -9,3 +9,9 @@ SELECT * FROM tbl_users;
 
 USE bootDB;
 SELECT * FROM tbl_books;
+DESC tbl_books;
+
+SHOW TABLES;
+SELECT * FROM  tbl_users;
+SELECT * FROM tbl_authorities;
+
